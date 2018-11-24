@@ -20,6 +20,7 @@ from __future__ import print_function
 
 import collections
 import unicodedata
+import six
 import os
 import logging
 
@@ -38,6 +39,27 @@ PRETRAINED_VOCAB_ARCHIVE_MAP = {
     'bert-base-chinese': "https://s3.amazonaws.com/models.huggingface.co/bert/bert-base-chinese-vocab.txt",
 }
 
+
+def convert_to_unicode(text):
+    """Converts `text` to Unicode (if it's not already), assuming utf-8 input."""
+    if six.PY3:
+        if isinstance(text, str):
+            return text
+        elif isinstance(text, bytes):
+            return text.decode("utf-8", "ignore")
+        else:
+            raise ValueError("Unsupported string type: %s" % (type(text)))
+    elif six.PY2:
+        if isinstance(text, str):
+            return text.decode("utf-8", "ignore")
+        elif isinstance(text, unicode):
+            return text
+        else:
+            raise ValueError("Unsupported string type: %s" % (type(text)))
+    else:
+        raise ValueError("Not running on Python2 or Python 3?")
+
+        
 def printable_text(text):
     """Returns text encoded in a way suitable for print or `tf.logging`."""
 
